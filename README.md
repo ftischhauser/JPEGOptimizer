@@ -1,4 +1,4 @@
-# JPEGOptimizer Lightroom Plugin
+# JPEG Optimizer Lightroom Plugin
 This plugin combines [jpegtran](http://www.ijg.org/) and [exiv2](http://www.exiv2.org/) in a post-process action to squeeze out a few kilobytes from your JPEGs without affecting the image data. It can be used during exports and with publish services.  
 __Only Windows is supported at the moment!__ If want to help by compiling and statically linking the necessary tools for distribution, let me know.
 
