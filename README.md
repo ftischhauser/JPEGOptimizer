@@ -3,14 +3,14 @@ This plugin combines [jpegtran](http://www.ijg.org/) and [exiv2](http://www.exiv
 __Only Windows is supported at the moment!__ If you want to help by compiling and statically linking the necessary tools for distribution on OS X, let me know.
 
 ## Download
-You can download the latest release from [here](http://gralsburg.org/JPEGOptimizer/JPEGOptimizer-1.0.0.1.zip).
+You can download the latest release from [here](http://ftischhauser-github.s3.amazonaws.com/JPEGOptimizer-1.0.0.2.zip).
 
 ## Installation
 * Extract the folder "JPEGOptimizer.lrplugin" from the ZIP file to "%APPDATA%\Adobe\Lightroom\Modules" and restart Lightroom. Alternatively you can put it anywhere else and manually load it through the plugin manager.
 * After that you should see a new post process action in the export dialog and the publish service settings:  
-  ![Post-Process Actions:](http://gralsburg.org/JPEGOptimizer/ftjo-ss-ppa.png)
+  ![Post-Process Actions:](http://ftischhauser-github.s3.amazonaws.com/ftjo-ss-ppa.png)
 * Select the action and click on insert:  
-  ![JPEG Optimizer](http://gralsburg.org/JPEGOptimizer/ftjo-ss-jpo.png)
+  ![JPEG Optimizer](http://ftischhauser-github.s3.amazonaws.com/ftjo-ss-jpo.png)
 
 
 ## Options
