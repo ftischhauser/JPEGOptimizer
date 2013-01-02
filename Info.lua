@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2012 Flavio Tischhauser <ftischhauser@gmail.com>
+Copyright (c) 2013 Flavio Tischhauser <ftischhauser@gmail.com>
 https://github.com/ftischhauser/JPEGOptimizer
 
 Permission is hereby granted, free of charge, to any person
