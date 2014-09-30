@@ -1,9 +1,9 @@
 # JPEG Optimizer Lightroom Plugin
 This plugin combines [jpegtran](http://www.ijg.org/) and [exiv2](http://www.exiv2.org/) in a post-process action to squeeze out a few kilobytes from your JPEGs without affecting the image data. It can be used during exports and with publish services.  
-__Only Windows is supported at the moment!__ If you want to help by compiling and statically linking the necessary tools for distribution on OS X, let me know.
+__OS X support is currently experimental!__
 
 ## Download
-You can download the latest release from [here](http://ftischhauser-github.s3.amazonaws.com/JPEGOptimizer-1.0.0.2.zip).
+You can download the latest release from [here](https://github.com/ftischhauser/JPEGOptimizer/releases/download/v1.1.0.1/JPEGOptimizer-1.1.0.1.zip).
 
 ## Installation
 * Extract the folder "JPEGOptimizer.lrplugin" from the ZIP file to "%APPDATA%\Adobe\Lightroom\Modules" and restart Lightroom. Alternatively you can put it anywhere else and manually load it through the plugin manager.

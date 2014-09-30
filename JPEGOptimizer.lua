@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2013 Flavio Tischhauser <ftischhauser@gmail.com>
+Copyright (c) 2014 Flavio Tischhauser <ftischhauser@gmail.com>
 https://github.com/ftischhauser/JPEGOptimizer
 
 Permission is hereby granted, free of charge, to any person
@@ -53,84 +53,70 @@ return {
 		{key = 'FTJO_Arithmetic', default = false}
 	},
 	sectionForFilterInDialog = function(viewFactory, propertyTable)
-		if MAC_ENV then
-			return {
-				title = 'JPEG Optimizer',
-				viewFactory:static_text {title = 'Sorry, JPEG Optimizer is not yet supported on OS X!'}
-			}
-		else
-			propertyTable:addObserver('FTJO_Optimize', ObserveFTJO_Optimize)
-			propertyTable:addObserver('FTJO_Arithmetic', ObserveFTJO_Arithmetic)
-			propertyTable:addObserver('FTJO_RemovePreview', ObserveFTJO_RemovePreview)
-			propertyTable:addObserver('FTJO_StripMetadata', ObserveFTJO_StripMetadata)
-			return {
-				title = 'JPEG Optimizer',
+		propertyTable:addObserver('FTJO_Optimize', ObserveFTJO_Optimize)
+		propertyTable:addObserver('FTJO_Arithmetic', ObserveFTJO_Arithmetic)
+		propertyTable:addObserver('FTJO_RemovePreview', ObserveFTJO_RemovePreview)
+		propertyTable:addObserver('FTJO_StripMetadata', ObserveFTJO_StripMetadata)
+		return {
+			title = 'JPEG Optimizer',
+			viewFactory:column {
+				spacing = viewFactory:control_spacing(),
 				viewFactory:column {
-					spacing = viewFactory:control_spacing(),
-					viewFactory:column {
-						viewFactory:static_text {title = 'Please visit the homepage for help with these options:'},
-						viewFactory:static_text {
-							title = 'http://github.com/ftischhauser/JPEGOptimizer',
-							mouse_down = function() LrHttp.openUrlInBrowser('http://github.com/ftischhauser/JPEGOptimizer') end,
-							text_color = LrColor( 0, 0, 1 )
+					viewFactory:static_text {title = 'Please visit the homepage for help with these options:'},
+					viewFactory:static_text {
+						title = 'http://github.com/ftischhauser/JPEGOptimizer',
+						mouse_down = function() LrHttp.openUrlInBrowser('http://github.com/ftischhauser/JPEGOptimizer') end,
+						text_color = LrColor( 0, 0, 1 )
+					},
+					viewFactory:spacer {height = 10},
+					viewFactory:group_box {
+						title = 'Metadata',
+						viewFactory:checkbox {
+							title = 'Remove EXIF thumbnail',
+							value = LrView.bind 'FTJO_RemovePreview',
+							checked_value = true,
+							unchecked_value = false
 						},
-						viewFactory:spacer {height = 10},
-						viewFactory:group_box {
-							title = 'Metadata',
-							viewFactory:checkbox {
-								title = 'Remove EXIF thumbnail',
-								value = LrView.bind 'FTJO_RemovePreview',
-								checked_value = true,
-								unchecked_value = false
-							},
-							viewFactory:checkbox {
-								title = 'Strip ALL metadata (including thumbnail)',
-								value = LrView.bind 'FTJO_StripMetadata',
-								checked_value = true,
-								unchecked_value = false
-							}
+						viewFactory:checkbox {
+							title = 'Strip ALL metadata (including thumbnail)',
+							value = LrView.bind 'FTJO_StripMetadata',
+							checked_value = true,
+							unchecked_value = false
+						}
+					},
+					viewFactory:group_box {
+						title = 'Optimizations',
+						viewFactory:static_text {title = 'All optimizations are lossless!'},
+						viewFactory:checkbox {
+							title = 'Optimize Huffman table',
+							value = LrView.bind 'FTJO_Optimize',
+							checked_value = true,
+							unchecked_value = false
 						},
-						viewFactory:group_box {
-							title = 'Optimizations',
-							viewFactory:static_text {title = 'All optimizations are lossless!'},
-							viewFactory:checkbox {
-								title = 'Optimize Huffman table',
-								value = LrView.bind 'FTJO_Optimize',
-								checked_value = true,
-								unchecked_value = false
-							},
-							viewFactory:checkbox {
-								title = 'Convert to progressive JPEG',
-								value = LrView.bind 'FTJO_Progressive',
-								checked_value = true,
-								unchecked_value = false
-							},
-							viewFactory:checkbox {
-								title = 'Use arithmetic coding instead of Huffman (not widely supported yet!)',
-								value = LrView.bind 'FTJO_Arithmetic',
-								checked_value = true,
-								unchecked_value = false
-							}
+						viewFactory:checkbox {
+							title = 'Convert to progressive JPEG',
+							value = LrView.bind 'FTJO_Progressive',
+							checked_value = true,
+							unchecked_value = false
+						},
+						viewFactory:checkbox {
+							title = 'Use arithmetic coding instead of Huffman (not widely supported yet!)',
+							value = LrView.bind 'FTJO_Arithmetic',
+							checked_value = true,
+							unchecked_value = false
 						}
 					}
 				}
 			}
-		end
+		}
 	end,
 	postProcessRenderedPhotos = function(functionContext, filterContext)
-		if MAC_ENV then
-			for sourceRendition, renditionToSatisfy in filterContext:renditions() do
-				sourceRendition:waitForRender()
-				renditionToSatisfy:renditionIsDone(false, 'Sorry, JPEG Optimizer is not yet supported on OS X!')
-			end
-			return
-		end
-
 		local JpegtranCMD
 		local JpegtranNeeded = filterContext.propertyTable.FTJO_StripMetadata or filterContext.propertyTable.FTJO_Optimize or filterContext.propertyTable.FTJO_Progressive or filterContext.propertyTable.FTJO_Arithmetic
 		if JpegtranNeeded then
-			JpegtranCMD = '"' .. LrPathUtils.child(_PLUGIN.path, 'jpegtran.exe') .. '" '
-			JpegtranCMD = filterContext.propertyTable.FTJO_StripMetadata and JpegtranCMD .. '-copy none ' or JpegtranCMD .. '-copy all '
+			JpegtranCMD = '"' .. LrPathUtils.child(_PLUGIN.path, 'jpegtran')
+			if WIN_ENV then JpegtranCMD = JpegtranCMD .. '.exe' end
+			JpegtranCMD = filterContext.propertyTable.FTJO_StripMetadata and JpegtranCMD .. '" -copy none ' or JpegtranCMD .. '" -copy all '
 			if filterContext.propertyTable.FTJO_Optimize and not filterContext.propertyTable.FTJO_Arithmetic then JpegtranCMD = JpegtranCMD .. '-optimize ' end
 			if filterContext.propertyTable.FTJO_Progressive then JpegtranCMD = JpegtranCMD .. '-progressive ' end
 			if filterContext.propertyTable.FTJO_Arithmetic then JpegtranCMD = JpegtranCMD .. '-arithmetic ' end
@@ -143,11 +129,16 @@ return {
 					break
 				end
 				if JpegtranNeeded then
-					local JpegtranCMD = JpegtranCMD .. '"' .. LrPathUtils.standardizePath(pathOrMessage) .. '" "' .. LrPathUtils.standardizePath(pathOrMessage) .. '"'
-					if LrTasks.execute('"' .. JpegtranCMD .. '"') ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Jpegtran encountered an error.') end
+					local JpegtranCMD = JpegtranCMD .. '-outfile "' .. LrPathUtils.standardizePath(pathOrMessage) .. '" "' .. LrPathUtils.standardizePath(pathOrMessage) .. '"'
+					if WIN_ENV then JpegtranCMD = '"' .. JpegtranCMD .. '"' end
+					if LrTasks.execute(JpegtranCMD) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Jpegtran encountered an error.') end
 				end
 				if filterContext.propertyTable.FTJO_RemovePreview and not filterContext.propertyTable.FTJO_StripMetadata then
-					if LrTasks.execute('""' .. LrPathUtils.child(_PLUGIN.path, 'exiv2.exe') .. '" -d t rm "' .. LrPathUtils.standardizePath(pathOrMessage) .. '""') ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Exiv2 encountered an error.') end
+					local ExivCMD = LrPathUtils.child(_PLUGIN.path, 'exiv2')
+					if WIN_ENV then ExivCMD = ExivCMD .. '.exe' end
+					ExivCMD = '"' .. ExivCMD .. '" -d t rm "' .. LrPathUtils.standardizePath(pathOrMessage) .. '"'
+					if WIN_ENV then ExivCMD = '"' .. ExivCMD .. '"' end
+						if LrTasks.execute(ExivCMD) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Exiv2 encountered an error.') end
 				end
 			else
 				renditionToSatisfy:renditionIsDone(false, pathOrMessage)
