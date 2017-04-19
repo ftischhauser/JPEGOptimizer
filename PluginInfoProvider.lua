@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2014 Flavio Tischhauser <ftischhauser@gmail.com>
+Copyright (c) 2017 Flavio Tischhauser <ftischhauser@gmail.com>
 https://github.com/ftischhauser/JPEGOptimizer
 
 Permission is hereby granted, free of charge, to any person
@@ -26,6 +26,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 local LrHttp = import 'LrHttp'
 local LrColor = import 'LrColor'
+local LrView = import 'LrView'
 
 return {
 		sectionsForTopOfDialog = function( viewFactory, propertyTable )
@@ -35,20 +36,48 @@ return {
 				viewFactory:column {
 					viewFactory:static_text {title = 'Author: Flavio Tischhauser <ftischhauser@gmail.com>'},
 					viewFactory:spacer {height = 10},
-					viewFactory:static_text {title = 'This plugin uses and ships with the following awesome tools:'},
+					viewFactory:static_text {title = 'This plugin ships with the following awesome tools:'},
 					viewFactory:row {
-						viewFactory:static_text {title = 'jpegtran:'},
 						viewFactory:static_text {
-							title = 'http://www.ijg.org/',
-							mouse_down = function() LrHttp.openUrlInBrowser('http://www.ijg.org/') end,
+							title = 'exiv2:',
+							width = LrView.share "FTJO_PIL_width"
+						},
+						viewFactory:static_text {
+							title = 'http://www.exiv2.org/',
+							mouse_down = function() LrHttp.openUrlInBrowser('http://www.exiv2.org/') end,
 							text_color = LrColor( 0, 0, 1 )
 						}
 					},
 					viewFactory:row {
-						viewFactory:static_text {title = 'exiv2:'},
 						viewFactory:static_text {
-							title = 'http://www.exiv2.org/',
-							mouse_down = function() LrHttp.openUrlInBrowser('http://www.exiv2.org/') end,
+							title = 'ImageMagick:',
+							width = LrView.share "FTJO_PIL_width"
+						},
+						viewFactory:static_text {
+							title = 'https://www.imagemagick.org/',
+							mouse_down = function() LrHttp.openUrlInBrowser('https://www.imagemagick.org/') end,
+							text_color = LrColor( 0, 0, 1 )
+						}
+					},
+					viewFactory:row {
+						viewFactory:static_text {
+							title = 'jpeg-archive:',
+							width = LrView.share "FTJO_PIL_width"
+						},
+						viewFactory:static_text {
+							title = 'https://github.com/danielgtaylor/jpeg-archive/',
+							mouse_down = function() LrHttp.openUrlInBrowser('https://github.com/danielgtaylor/jpeg-archive/') end,
+							text_color = LrColor( 0, 0, 1 )
+						}
+					},
+					viewFactory:row {
+						viewFactory:static_text {
+							title = 'mozjpeg:',
+							width = LrView.share "FTJO_PIL_width"
+						},
+						viewFactory:static_text {
+							title = 'https://github.com/mozilla/mozjpeg/',
+							mouse_down = function() LrHttp.openUrlInBrowser('https://github.com/mozilla/mozjpeg/') end,
 							text_color = LrColor( 0, 0, 1 )
 						}
 					}
