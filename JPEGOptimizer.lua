@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2014 Flavio Tischhauser <ftischhauser@gmail.com>
+Copyright (c) 2017 Flavio Tischhauser <ftischhauser@gmail.com>
 https://github.com/ftischhauser/JPEGOptimizer
 
 Permission is hereby granted, free of charge, to any person
@@ -30,13 +30,8 @@ local LrTasks = import 'LrTasks'
 local LrHttp = import 'LrHttp'
 local LrColor = import 'LrColor'
 local LrDialogs = import 'LrDialogs'
+local LrFileUtils = import'LrFileUtils'
 
-ObserveFTJO_Optimize = function (propertyTable)
-	if(propertyTable.FTJO_Optimize) then propertyTable.FTJO_Arithmetic = false end
-end
-ObserveFTJO_Arithmetic = function (propertyTable)
-	if(propertyTable.FTJO_Arithmetic) then propertyTable.FTJO_Optimize = false end
-end
 ObserveFTJO_RemovePreview = function (propertyTable)
 	if(propertyTable.FTJO_RemovePreview) then propertyTable.FTJO_StripMetadata = false end
 end
@@ -46,99 +41,216 @@ end
 
 return {
 	exportPresetFields = {
-		{key = 'FTJO_RemovePreview', default = false},
+		{key = 'FTJO_RemovePreview', default = true},
 		{key = 'FTJO_StripMetadata', default = false},
-		{key = 'FTJO_Optimize', default = true},
-		{key = 'FTJO_Progressive', default = false},
-		{key = 'FTJO_Arithmetic', default = false}
+		{key = 'FTJO_Progressive', default = true},
+		{key = 'FTJO_Recompress', default = false},
+		{key = 'FTJO_JRCQuality', default = 'medium'},
+		{key = 'FTJO_JRCMethod', default = 'smallfry'},
+		{key = 'FTJO_JRCSubsampling', default = true}
 	},
 	sectionForFilterInDialog = function(viewFactory, propertyTable)
-		propertyTable:addObserver('FTJO_Optimize', ObserveFTJO_Optimize)
-		propertyTable:addObserver('FTJO_Arithmetic', ObserveFTJO_Arithmetic)
-		propertyTable:addObserver('FTJO_RemovePreview', ObserveFTJO_RemovePreview)
-		propertyTable:addObserver('FTJO_StripMetadata', ObserveFTJO_StripMetadata)
-		return {
-			title = 'JPEG Optimizer',
-			viewFactory:column {
-				spacing = viewFactory:control_spacing(),
+		if MAC_ENV then
+			return {
+				title = 'JPEG Optimizer',
+				viewFactory:static_text {title = 'Sorry, this version of JPEG Optimizer is not supported on macOS!'}
+			}
+		else
+			propertyTable:addObserver('FTJO_RemovePreview', ObserveFTJO_RemovePreview)
+			propertyTable:addObserver('FTJO_StripMetadata', ObserveFTJO_StripMetadata)
+			return {
+				title = 'JPEG Optimizer',
 				viewFactory:column {
-					viewFactory:static_text {title = 'Please visit the homepage for help with these options:'},
-					viewFactory:static_text {
-						title = 'http://github.com/ftischhauser/JPEGOptimizer',
-						mouse_down = function() LrHttp.openUrlInBrowser('http://github.com/ftischhauser/JPEGOptimizer') end,
-						text_color = LrColor( 0, 0, 1 )
-					},
-					viewFactory:spacer {height = 10},
-					viewFactory:group_box {
-						title = 'Metadata',
-						viewFactory:checkbox {
-							title = 'Remove EXIF thumbnail',
-							value = LrView.bind 'FTJO_RemovePreview',
-							checked_value = true,
-							unchecked_value = false
+					spacing = viewFactory:control_spacing(),
+					viewFactory:column {
+						viewFactory:static_text {title = 'Please visit the homepage for help with these options:'},
+						viewFactory:static_text {
+							title = 'http://github.com/ftischhauser/JPEGOptimizer',
+							mouse_down = function() LrHttp.openUrlInBrowser('http://github.com/ftischhauser/JPEGOptimizer') end,
+							text_color = LrColor( 0, 0, 1 )
 						},
-						viewFactory:checkbox {
-							title = 'Strip ALL metadata (including thumbnail)',
-							value = LrView.bind 'FTJO_StripMetadata',
-							checked_value = true,
-							unchecked_value = false
-						}
-					},
-					viewFactory:group_box {
-						title = 'Optimizations',
-						viewFactory:static_text {title = 'All optimizations are lossless!'},
-						viewFactory:checkbox {
-							title = 'Optimize Huffman table',
-							value = LrView.bind 'FTJO_Optimize',
-							checked_value = true,
-							unchecked_value = false
+						viewFactory:spacer {height = 10},
+						viewFactory:group_box {
+							title = 'Lossless Optimizations',
+							viewFactory:checkbox {
+								title = 'Remove EXIF thumbnail',
+								value = LrView.bind 'FTJO_RemovePreview',
+								checked_value = true,
+								unchecked_value = false
+							},
+							viewFactory:checkbox {
+								title = 'Strip ALL metadata (including thumbnail)',
+								value = LrView.bind 'FTJO_StripMetadata',
+								checked_value = true,
+								unchecked_value = false
+							},
+							viewFactory:checkbox {
+								title = 'Progressive encoding (smaller)',
+								value = LrView.bind 'FTJO_Progressive',
+								checked_value = true,
+								unchecked_value = false
+							},
+							viewFactory:column {
+								viewFactory:static_text {
+									title = 'Powered by mozjpeg and exiv2:'
+								},
+								viewFactory:static_text {
+									title = 'https://github.com/mozilla/mozjpeg/',
+									mouse_down = function() LrHttp.openUrlInBrowser('https://github.com/mozilla/mozjpeg/') end,
+									text_color = LrColor( 0, 0, 1 )
+								},
+								viewFactory:static_text {
+									title = 'http://www.exiv2.org/',
+									mouse_down = function() LrHttp.openUrlInBrowser('http://www.exiv2.org/') end,
+									text_color = LrColor( 0, 0, 1 )
+								}
+							}
 						},
-						viewFactory:checkbox {
-							title = 'Convert to progressive JPEG',
-							value = LrView.bind 'FTJO_Progressive',
-							checked_value = true,
-							unchecked_value = false
-						},
-						viewFactory:checkbox {
-							title = 'Use arithmetic coding instead of Huffman (not widely supported yet!)',
-							value = LrView.bind 'FTJO_Arithmetic',
-							checked_value = true,
-							unchecked_value = false
+						viewFactory:group_box {
+							title = 'Recompression',
+							viewFactory:checkbox {
+								title = 'Recompress JPEG',
+								value = LrView.bind 'FTJO_Recompress',
+								checked_value = true,
+								unchecked_value = false,
+							},
+							viewFactory:static_text {
+								enabled = LrView.bind 'FTJO_Recompress',
+								title = "Automatically sets the optimal JPEG compression by measuring the perceived visual quality."
+							},
+							viewFactory:checkbox {
+								enabled = LrView.bind 'FTJO_Recompress',
+								title = 'Chroma subsampling (smaller)',
+								value = LrView.bind 'FTJO_JRCSubsampling',
+								checked_value = true,
+								unchecked_value = false,
+							},
+							viewFactory:row {
+								viewFactory:static_text {
+									enabled = LrView.bind 'FTJO_Recompress',
+									title = "Quality:",
+									width = LrView.share "FTJO_Recompress_label_width",
+								},
+								viewFactory:popup_menu {
+									enabled = LrView.bind 'FTJO_Recompress',
+									value = LrView.bind 'FTJO_JRCQuality',
+									width = LrView.share "FTJO_Recompress_popup_width",
+									items = {
+										{ title = "Low", value = 'low'},
+										{ title = "Medium", value = 'medium'},
+										{ title = "High", value = 'high'},
+										{ title = "Very High", value = 'veryhigh'}
+									}
+								}
+							},
+							viewFactory:row {
+								viewFactory:static_text {
+									enabled = LrView.bind 'FTJO_Recompress',
+									title = "Method:",
+									width = LrView.share "FTJO_Recompress_label_width",
+								},
+								viewFactory:popup_menu {
+									enabled = LrView.bind 'FTJO_Recompress',
+									value = LrView.bind 'FTJO_JRCMethod',
+									width = LrView.share "FTJO_Recompress_popup_width",
+									items = {
+										{ title = "MPE", value = 'mpe'},
+										{ title = "SSIM", value = 'ssim'},
+										{ title = "MS-SSIM", value = 'ms-ssim'},
+										{ title = "SmallFry", value = 'smallfry'}
+									}
+								}
+							},
+							viewFactory:column {
+								viewFactory:static_text {
+									title = 'Powered by jpeg-archive and ImageMagick:',
+									enabled = LrView.bind 'FTJO_Recompress',
+								},
+								viewFactory:static_text {
+									enabled = LrView.bind 'FTJO_Recompress',
+									title = 'https://github.com/danielgtaylor/jpeg-archive/',
+									mouse_down = function() LrHttp.openUrlInBrowser('https://github.com/danielgtaylor/jpeg-archive/') end,
+									text_color = LrColor( 0, 0, 1 )
+								},
+								viewFactory:static_text {
+									enabled = LrView.bind 'FTJO_Recompress',
+									title = 'https://www.imagemagick.org/',
+									mouse_down = function() LrHttp.openUrlInBrowser('https://www.imagemagick.org/') end,
+									text_color = LrColor( 0, 0, 1 )
+								}
+							}
 						}
 					}
 				}
 			}
-		}
+		end
 	end,
 	postProcessRenderedPhotos = function(functionContext, filterContext)
-		local JpegtranCMD
-		local JpegtranNeeded = filterContext.propertyTable.FTJO_StripMetadata or filterContext.propertyTable.FTJO_Optimize or filterContext.propertyTable.FTJO_Progressive or filterContext.propertyTable.FTJO_Arithmetic
-		if JpegtranNeeded then
-			JpegtranCMD = '"' .. LrPathUtils.child(_PLUGIN.path, 'jpegtran')
-			if WIN_ENV then JpegtranCMD = JpegtranCMD .. '.exe' end
-			JpegtranCMD = filterContext.propertyTable.FTJO_StripMetadata and JpegtranCMD .. '" -copy none ' or JpegtranCMD .. '" -copy all '
-			if filterContext.propertyTable.FTJO_Optimize and not filterContext.propertyTable.FTJO_Arithmetic then JpegtranCMD = JpegtranCMD .. '-optimize ' end
-			if filterContext.propertyTable.FTJO_Progressive then JpegtranCMD = JpegtranCMD .. '-progressive ' end
-			if filterContext.propertyTable.FTJO_Arithmetic then JpegtranCMD = JpegtranCMD .. '-arithmetic ' end
+		if MAC_ENV then
+			for sourceRendition, renditionToSatisfy in filterContext:renditions() do
+				sourceRendition:waitForRender()
+				renditionToSatisfy:renditionIsDone(false, 'Sorry, this version of JPEG Optimizer is not supported on macOS!')
+			end
+			return
 		end
-		for sourceRendition, renditionToSatisfy in filterContext:renditions() do
+
+		local UPexiv2 = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'exiv2'),'exiv2.exe') .. '"'
+		local UPImageMagick = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'ImageMagick'),'magick.exe') .. '"'
+		local UPjpegrecompress = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'jpeg-archive'),'jpeg-recompress.exe') .. '"'
+		local UPjpegtran = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'mozjpeg'),'jpegtran.exe') .. '"'
+
+		local renditionOptions = {
+			filterSettings = function( renditionToSatisfy, exportSettings )
+				if filterContext.propertyTable.FTJO_Recompress then
+					exportSettings.LR_format = 'TIFF'
+					exportSettings.LR_export_colorSpace = 'sRGB'
+					exportSettings.LR_export_bitDepth = '8'
+					exportSettings.LRtiff_compressionMethod = 'compressionMethod_None'
+				end
+			end,
+		}
+
+		for sourceRendition, renditionToSatisfy in filterContext:renditions(renditionOptions) do
 			local success, pathOrMessage = sourceRendition:waitForRender()
 			if success then
-				if filterContext.propertyTable.LR_format ~= 'JPEG' then
-					renditionToSatisfy:renditionIsDone(false, 'JPEG Optimizer only works with JPEGs (check the image format settings).')
+				if filterContext.propertyTable.LR_format ~= 'JPEG' and not filterContext.propertyTable.FTJO_Recompress then
+					renditionToSatisfy:renditionIsDone(false, 'Lossless optimizations only work on JPEG files. Please check the image format settings or activate recompression.')
 					break
 				end
-				if JpegtranNeeded then
-					local JpegtranCMD = JpegtranCMD .. '-outfile "' .. LrPathUtils.standardizePath(pathOrMessage) .. '" "' .. LrPathUtils.standardizePath(pathOrMessage) .. '"'
-					if WIN_ENV then JpegtranCMD = '"' .. JpegtranCMD .. '"' end
-					if LrTasks.execute(JpegtranCMD) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Jpegtran encountered an error.') end
-				end
-				if filterContext.propertyTable.FTJO_RemovePreview and not filterContext.propertyTable.FTJO_StripMetadata then
-					local ExivCMD = LrPathUtils.child(_PLUGIN.path, 'exiv2')
-					if WIN_ENV then ExivCMD = ExivCMD .. '.exe' end
-					ExivCMD = '"' .. ExivCMD .. '" -d t rm "' .. LrPathUtils.standardizePath(pathOrMessage) .. '"'
-					if WIN_ENV then ExivCMD = '"' .. ExivCMD .. '"' end
-						if LrTasks.execute(ExivCMD) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Exiv2 encountered an error.') end
+
+				local ExpFileName = LrPathUtils.standardizePath(pathOrMessage)
+				if filterContext.propertyTable.FTJO_Recompress then
+					if not filterContext.propertyTable.FTJO_StripMetadata then
+						if LrTasks.execute('"' .. UPexiv2 .. ' -q -f -eX "' .. ExpFileName .. '""') ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error exporting XMP data.') end
+						if not filterContext.propertyTable.FTJO_RemovePreview then
+							if LrTasks.execute('"' .. UPImageMagick .. ' -quiet "' .. ExpFileName .. '" -resize 256x256 ppm:- | ' .. UPjpegrecompress .. ' --quiet --no-progressive --method smallfry --quality low --strip --ppm - "' .. LrPathUtils.removeExtension(ExpFileName) .. '-thumb.jpg""') ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error creating EXIF thumbnail.') end
+						end
+					end
+					local CmdRecompress = UPImageMagick .. ' -quiet "' .. ExpFileName .. '" ppm:- | ' .. UPjpegrecompress .. ' --quiet --accurate --method ' .. filterContext.propertyTable.FTJO_JRCMethod .. ' --quality ' .. filterContext.propertyTable.FTJO_JRCQuality .. ' --strip'
+					if not filterContext.propertyTable.FTJO_Progressive then CmdRecompress = CmdRecompress .. ' --no-progressive' end
+					if not filterContext.propertyTable.FTJO_JRCSubsampling then CmdRecompress = CmdRecompress .. ' --subsample disable' end
+					CmdRecompress = CmdRecompress .. ' --ppm - "' .. ExpFileName ..  '"'
+					if WIN_ENV then CmdRecompress = '"' .. CmdRecompress .. '"' end
+					if LrTasks.execute(CmdRecompress) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error recompressing JPEG file.') end
+					if not filterContext.propertyTable.FTJO_StripMetadata then
+						if LrTasks.execute('"' .. UPexiv2 .. ' -q -f -iX "' .. ExpFileName .. '""') ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing XMP data.') end
+						LrFileUtils.delete(LrPathUtils.replaceExtension(ExpFileName, '.xmp'))
+						if not filterContext.propertyTable.FTJO_RemovePreview then
+							if LrTasks.execute('"' .. UPexiv2 .. ' -q -f -it "' .. ExpFileName .. '""') ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing EXIF thumbnail.') end
+							LrFileUtils.delete(LrPathUtils.removeExtension(ExpFileName) ..'-thumb.jpg')
+						end
+					end
+				else
+					if filterContext.propertyTable.FTJO_RemovePreview and not filterContext.propertyTable.FTJO_StripMetadata then
+						local CmdRemovePreview = UPexiv2 .. ' -q -f -dt "' .. ExpFileName .. '"'
+						if WIN_ENV then CmdRemovePreview = '"' .. CmdRemovePreview .. '"' end
+						if LrTasks.execute(CmdRemovePreview) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error removing EXIF thumbnail.') end
+					end
+					local CmdOptimize = filterContext.propertyTable.FTJO_StripMetadata and UPjpegtran .. ' -copy none' or UPjpegtran .. ' -copy all'
+					if not filterContext.propertyTable.FTJO_Progressive then CmdOptimize = CmdOptimize .. ' -revert -optimize' end
+					CmdOptimize = CmdOptimize .. ' -outfile "' .. ExpFileName .. '" "' .. ExpFileName .. '"'
+					if WIN_ENV then CmdOptimize = '"' .. CmdOptimize .. '"' end
+					if LrTasks.execute(CmdOptimize) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error optimizing JPEG file.') end
 				end
 			else
 				renditionToSatisfy:renditionIsDone(false, pathOrMessage)
