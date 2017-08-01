@@ -238,7 +238,7 @@ return {
 					if not filterContext.propertyTable.FTJO_StripMetadata then
 						local CmdInsertMetadata = UPexiv2 .. ' -q -f -iX "' .. ExpFileName .. '"'
 						if LrTasks.execute(quote4Win(CmdInsertMetadata)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing XMP data.') end
-						LrFileUtils.delete(LrPathUtils.replaceExtension(ExpFileName, '.xmp'))
+						LrFileUtils.delete(LrPathUtils.replaceExtension(ExpFileName, 'xmp'))
 						if not filterContext.propertyTable.FTJO_RemovePreview then
 							local CmdInsertPreview = UPexiv2 .. ' -q -f -it "' .. ExpFileName .. '"'
 							if LrTasks.execute(quote4Win(CmdInsertPreview)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing EXIF thumbnail.') end
