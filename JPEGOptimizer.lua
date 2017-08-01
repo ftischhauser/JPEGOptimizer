@@ -32,6 +32,10 @@ local LrColor = import 'LrColor'
 local LrDialogs = import 'LrDialogs'
 local LrFileUtils = import'LrFileUtils'
 
+quote4Win = function (cmd)
+	if (WIN_ENV) then return '"' .. cmd .. '"' else return cmd end
+end
+
 ObserveFTJO_RemovePreview = function (propertyTable)
 	if(propertyTable.FTJO_RemovePreview) then propertyTable.FTJO_StripMetadata = false end
 end
@@ -220,43 +224,36 @@ return {
 				if filterContext.propertyTable.FTJO_Recompress then
 					if not filterContext.propertyTable.FTJO_StripMetadata then
 						local CmdDumpMetadata = UPexiv2 .. ' -q -f -eX "' .. ExpFileName .. '"'
-						if WIN_ENV then CmdDumpMetadata = '"' .. CmdDumpMetadata .. '"' end
-						if LrTasks.execute(CmdDumpMetadata) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error exporting XMP data.') end
+						if LrTasks.execute(quote4Win(CmdDumpMetadata)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error exporting XMP data.') end
 						if not filterContext.propertyTable.FTJO_RemovePreview then
-							local CmdRenderPreview = UPImageMagick .. ' -quiet "' .. ExpFileName .. '" -resize 256x256 ppm:- | ' .. UPjpegrecompress .. ' --quiet --no-progressive --method smallfry --quality low --strip --ppm - "' .. LrPathUtils.removeExtension(ExpFileName) .. '-thumb.jpg"'
-							if WIN_ENV then CmdRenderPreview = '"' .. CmdRenderPreview .. '"' end
-							if LrTasks.execute(CmdRenderPreview) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error creating EXIF thumbnail.') end
+							local CmdRenderPreview = UPImageMagick .. ' "' .. ExpFileName .. '" -resize 256x256 ppm:- | ' .. UPjpegrecompress .. ' --quiet --no-progressive --method smallfry --quality low --strip --ppm - "' .. LrPathUtils.removeExtension(ExpFileName) .. '-thumb.jpg"'
+							if LrTasks.execute(quote4Win(CmdRenderPreview)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error creating EXIF thumbnail.') end
 						end
 					end
-					local CmdRecompress = UPImageMagick .. ' -quiet "' .. ExpFileName .. '" ppm:- | ' .. UPjpegrecompress .. ' --quiet --accurate --method ' .. filterContext.propertyTable.FTJO_JRCMethod .. ' --quality ' .. filterContext.propertyTable.FTJO_JRCQuality .. ' --strip'
+					local CmdRecompress = UPImageMagick .. ' "' .. ExpFileName .. '" ppm:- | ' .. UPjpegrecompress .. ' --quiet --accurate --method ' .. filterContext.propertyTable.FTJO_JRCMethod .. ' --quality ' .. filterContext.propertyTable.FTJO_JRCQuality .. ' --strip'
 					if not filterContext.propertyTable.FTJO_Progressive then CmdRecompress = CmdRecompress .. ' --no-progressive' end
 					if not filterContext.propertyTable.FTJO_JRCSubsampling then CmdRecompress = CmdRecompress .. ' --subsample disable' end
 					CmdRecompress = CmdRecompress .. ' --ppm - "' .. ExpFileName ..  '"'
-					if WIN_ENV then CmdRecompress = '"' .. CmdRecompress .. '"' end
-					if LrTasks.execute(CmdRecompress) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error recompressing JPEG file.') end
+					if LrTasks.execute(quote4Win(CmdRecompress)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error recompressing JPEG file.') end
 					if not filterContext.propertyTable.FTJO_StripMetadata then
 						local CmdInsertMetadata = UPexiv2 .. ' -q -f -iX "' .. ExpFileName .. '"'
-						if WIN_ENV then CmdInsertMetadata = '"' .. CmdInsertMetadata .. '"' end
-						if LrTasks.execute(CmdInsertMetadata) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing XMP data.') end
+						if LrTasks.execute(quote4Win(CmdInsertMetadata)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing XMP data.') end
 						LrFileUtils.delete(LrPathUtils.replaceExtension(ExpFileName, '.xmp'))
 						if not filterContext.propertyTable.FTJO_RemovePreview then
 							local CmdInsertPreview = UPexiv2 .. ' -q -f -it "' .. ExpFileName .. '"'
-							if WIN_ENV then CmdInsertPreview = '"' .. CmdInsertPreview .. '"' end
-							if LrTasks.execute(CmdInsertPreview) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing EXIF thumbnail.') end
+							if LrTasks.execute(quote4Win(CmdInsertPreview)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing EXIF thumbnail.') end
 							LrFileUtils.delete(LrPathUtils.removeExtension(ExpFileName) ..'-thumb.jpg')
 						end
 					end
 				else
 					if filterContext.propertyTable.FTJO_RemovePreview and not filterContext.propertyTable.FTJO_StripMetadata then
 						local CmdRemovePreview = UPexiv2 .. ' -q -f -dt "' .. ExpFileName .. '"'
-						if WIN_ENV then CmdRemovePreview = '"' .. CmdRemovePreview .. '"' end
-						if LrTasks.execute(CmdRemovePreview) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error removing EXIF thumbnail.') end
+						if LrTasks.execute(quote4Win(CmdRemovePreview)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error removing EXIF thumbnail.') end
 					end
 					local CmdOptimize = filterContext.propertyTable.FTJO_StripMetadata and UPjpegtran .. ' -copy none' or UPjpegtran .. ' -copy all'
 					if not filterContext.propertyTable.FTJO_Progressive then CmdOptimize = CmdOptimize .. ' -revert -optimize' end
 					CmdOptimize = CmdOptimize .. ' -outfile "' .. ExpFileName .. '" "' .. ExpFileName .. '"'
-					if WIN_ENV then CmdOptimize = '"' .. CmdOptimize .. '"' end
-					if LrTasks.execute(CmdOptimize) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error optimizing JPEG file.') end
+					if LrTasks.execute(quote4Win(CmdOptimize)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error optimizing JPEG file.') end
 				end
 			else
 				renditionToSatisfy:renditionIsDone(false, pathOrMessage)
