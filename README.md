@@ -8,7 +8,7 @@ This Lightroom plugin combines the following awesome tools in a post-process act
 It allows you to either losslessly squeeze out a few kilobytes from the JPEGs Lightroom generates, or it can take over the JPEG encoding completely and automatically set the optimal JPEG compression by measuring the perceived visual quality.
 
 ## Download
-You can download the latest release from [here](https://github.com/ftischhauser/JPEGOptimizer/releases/download/v2.0.0.1/JPEGOptimizer-2.0.0.1.zip).
+You can download the latest release from [here](https://github.com/ftischhauser/JPEGOptimizer/releases).
 
 ## Installation
 * Extract the folder "JPEGOptimizer.lrplugin" from the ZIP file to "%APPDATA%\Adobe\Lightroom\Modules" or any other location. Go to File Menu / Plug-in Manager / Add and then browse the folder location and add the 'JPEGOptimizer.lrplugin' folder.
