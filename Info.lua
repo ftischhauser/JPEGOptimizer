@@ -30,7 +30,7 @@ return {
 	LrToolkitIdentifier = 'ftischhauser.JPEGOptimizer',
 	LrPluginName = 'JPEG Optimizer',
 	LrPluginInfoUrl = 'https://github.com/ftischhauser/JPEGOptimizer/',
-	VERSION = { major=2, minor=1, revision=0, build=1},
+	VERSION = { major=2, minor=1, revision=1, build=1},
 	LrPluginInfoProvider = 'PluginInfoProvider.lua',
 	LrExportFilterProvider = {
 		title = 'JPEG Optimizer',
