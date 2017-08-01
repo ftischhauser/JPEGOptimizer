@@ -226,11 +226,11 @@ return {
 						local CmdDumpMetadata = UPexiv2 .. ' -q -f -eX "' .. ExpFileName .. '"'
 						if LrTasks.execute(quote4Win(CmdDumpMetadata)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error exporting XMP data.') end
 						if not filterContext.propertyTable.FTJO_RemovePreview then
-							local CmdRenderPreview = UPImageMagick .. ' -quiet "' .. ExpFileName .. '" -resize 256x256 ppm:- | ' .. UPjpegrecompress .. ' --quiet --no-progressive --method smallfry --quality low --strip --ppm - "' .. LrPathUtils.removeExtension(ExpFileName) .. '-thumb.jpg"'
+							local CmdRenderPreview = UPImageMagick .. ' "' .. ExpFileName .. '" -resize 256x256 ppm:- | ' .. UPjpegrecompress .. ' --quiet --no-progressive --method smallfry --quality low --strip --ppm - "' .. LrPathUtils.removeExtension(ExpFileName) .. '-thumb.jpg"'
 							if LrTasks.execute(quote4Win(CmdRenderPreview)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error creating EXIF thumbnail.') end
 						end
 					end
-					local CmdRecompress = UPImageMagick .. ' -quiet "' .. ExpFileName .. '" ppm:- | ' .. UPjpegrecompress .. ' --quiet --accurate --method ' .. filterContext.propertyTable.FTJO_JRCMethod .. ' --quality ' .. filterContext.propertyTable.FTJO_JRCQuality .. ' --strip'
+					local CmdRecompress = UPImageMagick .. ' "' .. ExpFileName .. '" ppm:- | ' .. UPjpegrecompress .. ' --quiet --accurate --method ' .. filterContext.propertyTable.FTJO_JRCMethod .. ' --quality ' .. filterContext.propertyTable.FTJO_JRCQuality .. ' --strip'
 					if not filterContext.propertyTable.FTJO_Progressive then CmdRecompress = CmdRecompress .. ' --no-progressive' end
 					if not filterContext.propertyTable.FTJO_JRCSubsampling then CmdRecompress = CmdRecompress .. ' --subsample disable' end
 					CmdRecompress = CmdRecompress .. ' --ppm - "' .. ExpFileName ..  '"'
