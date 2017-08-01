@@ -35,6 +35,7 @@ return {
 				title = 'Information',
 				viewFactory:column {
 					viewFactory:static_text {title = 'Author: Flavio Tischhauser <ftischhauser@gmail.com>'},
+					viewFactory:static_text {title = 'Contributors: Giles Winstanley (macOS support and other fixes)'},
 					viewFactory:spacer {height = 10},
 					viewFactory:static_text {title = 'This plugin ships with the following awesome tools:'},
 					viewFactory:row {
