@@ -248,7 +248,7 @@ return {
 					outputToLog('Recompress: ' .. CmdRecompress)
 					if LrTasks.execute(quote4Win(CmdRecompress)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error recompressing JPEG file.') end
 					if not filterContext.propertyTable.FTJO_StripMetadata then
-						local CmdInsertMetadata = UPexiv2 .. ' -q -f -iX "' .. ExpFileName .. '"'
+						local CmdInsertMetadata = UPexiv2 .. ' -q -f -iX "' .. ExpFileName .. '"' .. (MAC_ENV and ' 2>/dev/null')
 						outputToLog('Insert metadata: ' .. CmdInsertMetadata)
 						if LrTasks.execute(quote4Win(CmdInsertMetadata)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing XMP data.') end
 						LrFileUtils.delete(LrPathUtils.replaceExtension(ExpFileName, 'xmp'))
