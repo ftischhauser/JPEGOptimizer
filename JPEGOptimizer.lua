@@ -194,9 +194,9 @@ return {
 
 		-- Define paths for external tools
 		local UPexiv2 = 'exiv2'
-		local UPImageMagick = 'magick'
+		local UPImageMagick = 'ImageMagick'
 		local UPjpegrecompress = 'jpeg-archive'
-		local UPjpegtran = 'jpegtran'
+		local UPjpegtran = 'mozjpeg'
 		-- Define executable names for external tools
 		local UEexiv2 = 'exiv2' .. (WIN_ENV and '.exe' or '')
 		local UEImageMagick = MAC_ENV and 'convert' or 'ImageMagick.exe'
