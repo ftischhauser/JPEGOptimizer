@@ -192,22 +192,23 @@ return {
 	end,
 	postProcessRenderedPhotos = function(functionContext, filterContext)
 
+		-- Define paths for external tools
 		local UPexiv2 = 'exiv2'
 		local UPImageMagick = 'magick'
-		local UPjpegrecompress = 'jpeg-recompress'
+		local UPjpegrecompress = 'jpeg-archive'
 		local UPjpegtran = 'jpegtran'
-
-		if WIN_ENV then
-			UPexiv2 = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'exiv2'),UPexiv2) .. '.exe"'
-			UPImageMagick = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'ImageMagick'),UPImageMagick) .. '.exe"'
-			UPjpegrecompress = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'jpeg-archive'),UPjpegrecompress) .. '.exe"'
-			UPjpegtran = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'WIN'), 'mozjpeg'),UPjpegtran) .. '.exe"'
-		else
-			UPexiv2 = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'macOS'), 'exiv2'),UPexiv2) .. '"'
-			UPImageMagick = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'macOS'), 'ImageMagick'),UPImageMagick) .. '"'
-			UPjpegrecompress = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'macOS'), 'jpeg-archive'),UPjpegrecompress) .. '"'
-			UPjpegtran = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, 'macOS'), 'mozjpeg'),UPjpegtran) .. '"'
-		end
+		-- Define executable names for external tools
+		local UEexiv2 = 'exiv2' .. (WIN_ENV and '.exe' or '')
+		local UEImageMagick = MAC_ENV and 'convert' or 'ImageMagick.exe'
+		local UEjpegrecompress = 'jpeg-recompress' .. (WIN_ENV and '.exe' or '')
+		local UEjpegtran = 'jpegtran' .. (WIN_ENV and '.exe' or '')
+		-- Define platform-specific path for external tools
+		local PlatPath = MAC_ENV and 'macOS' or 'WIN'
+		-- Construct commands for external tools
+		UPexiv2 = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPexiv2), UEexiv2) .. '"'
+		UPImageMagick = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPImageMagick), UEImageMagick) .. '"'
+		UPjpegrecompress = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPjpegrecompress), UEjpegrecompress) .. '"'
+		UPjpegtran = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPjpegrecompress), UEjpegtran) .. '"'
 
 		local renditionOptions = {
 			filterSettings = function( renditionToSatisfy, exportSettings )
