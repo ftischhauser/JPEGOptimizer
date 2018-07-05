@@ -204,8 +204,13 @@ return {
 		local UEjpegtran = 'jpegtran' .. (WIN_ENV and '.exe' or '')
 		-- Define platform-specific path for external tools
 		local PlatPath = MAC_ENV and 'macOS' or 'WIN'
-		-- Construct commands for external tools
-		UPexiv2 = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPexiv2), UEexiv2) .. '"'
+		-- Construct commands for external tools (reusing path variables)
+		if MAC_ENV then
+			local ExivPath = LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPexiv2)
+			UPexiv2 = 'LD_LIBRARY_PATH="' .. ExivPath .. '" "' .. LrPathUtils.child(ExivPath, UEexiv2) .. '"'
+		else
+			UPexiv2 = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPexiv2), UEexiv2) .. '"'
+		end
 		UPImageMagick = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPImageMagick), UEImageMagick) .. '"'
 		UPjpegrecompress = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPjpegrecompress), UEjpegrecompress) .. '"'
 		UPjpegtran = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPjpegrecompress), UEjpegtran) .. '"'
