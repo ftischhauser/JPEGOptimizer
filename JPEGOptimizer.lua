@@ -199,7 +199,7 @@ return {
 		local UPjpegtran = 'mozjpeg'
 		-- Define executable names for external tools
 		local UEexiv2 = 'exiv2' .. (WIN_ENV and '.exe' or '')
-		local UEImageMagick = MAC_ENV and 'convert' or 'ImageMagick.exe'
+		local UEImageMagick = MAC_ENV and 'convert' or 'magick.exe'
 		local UEjpegrecompress = 'jpeg-recompress' .. (WIN_ENV and '.exe' or '')
 		local UEjpegtran = 'jpegtran' .. (WIN_ENV and '.exe' or '')
 		-- Define platform-specific path for external tools
@@ -253,7 +253,7 @@ return {
 					outputToLog('Recompress: ' .. CmdRecompress)
 					if LrTasks.execute(quote4Win(CmdRecompress)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error recompressing JPEG file.') end
 					if not filterContext.propertyTable.FTJO_StripMetadata then
-						local CmdInsertMetadata = UPexiv2 .. ' -q -f -iX "' .. ExpFileName .. '"' .. (MAC_ENV and ' 2>/dev/null')
+						local CmdInsertMetadata = UPexiv2 .. ' -q -f -iX "' .. ExpFileName .. '"' .. (MAC_ENV and ' 2>/dev/null' or ' 2>nul')
 						outputToLog('Insert metadata: ' .. CmdInsertMetadata)
 						if LrTasks.execute(quote4Win(CmdInsertMetadata)) ~= 0 then renditionToSatisfy:renditionIsDone(false, 'Error importing XMP data.') end
 						LrFileUtils.delete(LrPathUtils.replaceExtension(ExpFileName, 'xmp'))
