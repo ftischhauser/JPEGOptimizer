@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2017 Flavio Tischhauser <ftischhauser@gmail.com>
+Copyright (c) 2018 Flavio Tischhauser <ftischhauser@gmail.com>
 https://github.com/ftischhauser/JPEGOptimizer
 
 Permission is hereby granted, free of charge, to any person
@@ -30,7 +30,7 @@ return {
 	LrToolkitIdentifier = 'ftischhauser.JPEGOptimizer',
 	LrPluginName = 'JPEG Optimizer',
 	LrPluginInfoUrl = 'https://github.com/ftischhauser/JPEGOptimizer/',
-	VERSION = { major=2, minor=0, revision=2, build=1},
+	VERSION = { major=2, minor=0, revision=3, build=1},
 	LrPluginInfoProvider = 'PluginInfoProvider.lua',
 	LrExportFilterProvider = {
 		title = 'JPEG Optimizer',
