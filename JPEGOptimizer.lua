@@ -213,7 +213,7 @@ return {
 		end
 		UPImageMagick = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPImageMagick), UEImageMagick) .. '"'
 		UPjpegrecompress = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPjpegrecompress), UEjpegrecompress) .. '"'
-		UPjpegtran = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPjpegrecompress), UEjpegtran) .. '"'
+		UPjpegtran = '"' .. LrPathUtils.child(LrPathUtils.child(LrPathUtils.child(_PLUGIN.path, PlatPath), UPjpegtran), UEjpegtran) .. '"'
 
 		local renditionOptions = {
 			filterSettings = function( renditionToSatisfy, exportSettings )
