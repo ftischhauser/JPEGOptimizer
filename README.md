@@ -29,7 +29,7 @@ Completely removes all metadata from the image. Also handy if you want to share 
 Besides the different display behavior during the image download, progressive JPEGs are also smaller. The best lossless optimizations are achieved with this option enabled, but the files will require more CPU to decode and can cause rare compatibility issues.
 
 ### Recompress JPEG
-This option will switch to the external encoder [jpeg-archive](https://github.com/danielgtaylor/jpeg-archive/) and not use Lightroom for JPEG encoding anymore. Instead it will force Lightroom to export a temporary TIFF file to prevent double-compression and achieve maximum quality. Keep the image format set to JPEG, the quality value will be ignored.
+This option will switch to the external encoder [jpeg-archive](https://github.com/danielgtaylor/jpeg-archive/) and not use Lightroom for JPEG encoding anymore. As a result, the Lightroom File Settings (such as JPEG quality or file size limit) will be ingored. Instead it will force Lightroom to export a temporary TIFF file to prevent double-compression and achieve maximum quality. Keep the image format set to JPEG, the quality value will be ignored.
 
 #### Chroma subsampling
 Subsampling reduces the resolution of the color channels which is rarely noticeably by the human eye. The Lightroom encoder enables this for all quality settings below 54, jpeg-archive allows you to manually choose this for all quality levels.
