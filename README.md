@@ -13,9 +13,9 @@ You can download the latest release from [here](https://github.com/ftischhauser/
 ## Installation
 * Extract the folder "JPEGOptimizer.lrplugin" from the ZIP file to "%APPDATA%\Adobe\Lightroom\Modules" or any other location. Go to File Menu / Plug-in Manager / Add and then browse the folder location and add the 'JPEGOptimizer.lrplugin' folder.
 * After that you should see a new post process action in the export dialog and the publish service settings:  
-  ![Post-Process Actions:](http://ftischhauser-github.s3.amazonaws.com/ftjo-ss-ppa-2.0.0.1.png)
+  ![Post-Process Actions:](screenshots/ftjo-ss-ppa-2.0.0.1.png)
 * Select the action and click on insert:  
-  ![JPEG Optimizer](http://ftischhauser-github.s3.amazonaws.com/ftjo-ss-jpo-2.0.0.1.png)
+  ![JPEG Optimizer](screenshots/ftjo-ss-jpo-2.0.0.1.png)
 
 ## Options
 
